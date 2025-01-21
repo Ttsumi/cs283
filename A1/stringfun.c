@@ -283,3 +283,7 @@ int main(int argc, char *argv[]){
 //          the buff variable will have exactly 50 bytes?
 //  
 //          PLACE YOUR ANSWER HERE
+//          Because we don't want to make the assumption that the length will always be a fixed size because it can change later.
+//          While in this particular program, the size of the buffer will always be 50, in general, its a good practice to
+//          dynamically handle these things, because if someone changes the size, it will break the program if we don't provide
+//          the length of the buffer
