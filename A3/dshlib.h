@@ -27,6 +27,7 @@ typedef struct command_list
 
 #define SH_PROMPT "dsh> "
 #define EXIT_CMD "exit"
+#define DRAGON_CMD "dragon"
 
 // Standard Return Codes
 #define OK 0

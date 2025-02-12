@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "dshlib.h"
+
+#define DRAGON_FILE "dragon.txt"
 
 void print_commandList(command_list_t *clist){
     printf(CMD_OK_HEADER, clist->num);
@@ -13,6 +16,22 @@ void print_commandList(command_list_t *clist){
         }
         printf("\n");
     }
+}
+
+size_t get_file_size(char *filename){
+    FILE *file = fopen(filename, "r");
+    if (!file){
+        return (size_t) -1;
+    }
+
+    fseek(file, 0, SEEK_END);
+    size_t size = ftell(file);
+    fclose(file);
+    return size;
+}
+
+void compress_ascii_art(char *buff){
+    printf("%s\n", buff);
 }
 
 /*
@@ -59,6 +78,9 @@ int main()
 {
     char *cmd_buff = malloc(SH_CMD_MAX);
     int rc = 0;
+    char *dragon_buff;
+    bool dragon_initialized = false;
+
     command_list_t *clist = (command_list_t *)malloc(sizeof(command_list_t));
 
     while(1){
@@ -74,9 +96,30 @@ int main()
         int success = build_cmd_list(cmd_buff, clist);
 
         if(success == OK){
-            if (clist->num > 0 && strcmp(clist->commands[clist->num - 1].exe, EXIT_CMD) == 0){
-                rc = OK;
-                break;
+            if (clist->num >0){
+                if (strcmp(clist->commands[clist->num - 1].exe, EXIT_CMD) == 0){
+                    rc = OK;
+                    break;
+                } else if (strcmp(clist->commands[clist->num - 1].exe, DRAGON_CMD) == 0){
+                    if (!dragon_initialized){
+                        size_t dragon_size = get_file_size(DRAGON_FILE);
+                        if (dragon_size == (size_t) -1){
+                            printf("Error getting size of file: %s\n", DRAGON_FILE);
+                            break;
+                        }
+                        dragon_buff = malloc(dragon_size);
+                        FILE *file = fopen(DRAGON_FILE, "r");
+                        size_t len = fread(dragon_buff, 1, dragon_size - 1, file);
+                        fclose(file);
+                        if (len == 0){
+                            printf("Error reading file: %s\n", DRAGON_FILE);
+                            break;
+                        }
+                        dragon_initialized = true;
+                    }
+                    printf("%s\n", dragon_buff);
+                    //eval_dragon_cmd(dragon_buff);
+                }
             }
             print_commandList(clist);
         } else if (success == ERR_TOO_MANY_COMMANDS){
@@ -84,6 +127,7 @@ int main()
         }
     }
 
+    free(dragon_buff);
     free(cmd_buff);
     free(clist);
     exit(rc);
