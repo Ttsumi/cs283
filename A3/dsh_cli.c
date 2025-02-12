@@ -30,10 +30,6 @@ size_t get_file_size(char *filename){
     return size;
 }
 
-void compress_ascii_art(char *buff){
-    printf("%s\n", buff);
-}
-
 /*
  * Implement your main function by building a loop that prompts the
  * user for input.  Use the SH_PROMPT constant from dshlib.h and then
@@ -118,7 +114,6 @@ int main()
                         dragon_initialized = true;
                     }
                     printf("%s\n", dragon_buff);
-                    //eval_dragon_cmd(dragon_buff);
                 }
             }
             print_commandList(clist);
