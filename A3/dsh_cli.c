@@ -30,6 +30,68 @@ size_t get_file_size(char *filename){
     return size;
 }
 
+void decompress_print_ascii(char *buff){
+    char *token;
+    char* saveptr = NULL;
+    char* inner_saveptr = NULL;
+    const char delim[] = " ";
+    const char inner_delimiters[] = "x";
+    token = strtok_r(buff, delim, &saveptr);
+    while (token != NULL){
+        
+        char* inner_token = strtok_r(token, inner_delimiters, &inner_saveptr);
+        if (inner_token){
+            int count = atoi(inner_token);
+            inner_token = strtok_r(NULL, "", &inner_saveptr);
+            for(int i=0; i < count; i++){
+                if (inner_token == NULL){
+                    printf(" ");
+                } else {
+                    printf("%s", inner_token);
+                }
+                /*
+                if (inner_token == NULL){
+                printf(" ");
+                } else if (strcmp(inner_token, "@")){
+                printf("AT\n");
+                }*/
+            }
+        }
+        //printf("\n");
+        token = strtok_r(NULL, delim, &saveptr);
+    }
+    //printf("\n%s\n", buff);
+}
+
+void compress_asci(char *buff){
+    int size = strlen(buff);
+    char tracking_char;
+    char temp[size * 2];
+    bool tracking = false;
+    int char_count = 0;
+    char *str;
+
+    for(int i=0; i< size - 1; i++){
+        if (!tracking && buff[i] == buff[i+1]){
+            tracking = true;
+        }
+        if (tracking && buff[i] != buff[i+1]){
+            tracking = false;
+            asprintf(&str, "%dx%c ", char_count, tracking_char);
+            //printf("%dx%c\t", char_count, tracking_char);
+            strcat(temp, str);
+            char_count = 0;
+            free(str);
+        }
+        if(tracking && buff[i] == buff[i+1]){
+            tracking_char = buff[i];
+            char_count++;
+        }
+    }
+    //printf("\n%s\n", temp);
+    decompress_print_ascii(temp);
+}
+
 /*
  * Implement your main function by building a loop that prompts the
  * user for input.  Use the SH_PROMPT constant from dshlib.h and then
@@ -117,6 +179,7 @@ int main()
                 }
             }
             print_commandList(clist);
+            //compress_asci(dragon_buff);
         } else if (success == ERR_TOO_MANY_COMMANDS){
             printf(CMD_ERR_PIPE_LIMIT, CMD_MAX);
         }
