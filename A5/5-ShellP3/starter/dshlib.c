@@ -63,7 +63,7 @@ int build_cmd_buff(char *cmd_line, cmd_buff_t *cbuff)
     } 
 
     for (int i = j; i < input_len; i++) {
-        if (cmd_line[i] == '"') {
+        if (cmd_line[i] == '"' || cmd_line[i] == '\'') {
             inQuotes = !inQuotes;
             continue; 
         }
@@ -313,7 +313,8 @@ int exec_local_cmd_loop()
                 return rc;
             }
         }
-        free_cmd_list(clist);
     }
+    free_cmd_list(clist);
+    free(clist);
     return rc;
 }

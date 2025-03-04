@@ -117,3 +117,25 @@ EOF
     [ "$stripped_output" = "$expected_output" ]
     [ "$status" -eq 0 ]
 }
+
+@test "Check max number of pipes work by reducing a string" {
+    run "./dsh" <<EOF                
+echo "hello world" | cut -d' ' -f2 | rev | cut -c 3- | rev | cut -c 1-2 | tr 'a-z' 'A-Z' | tr 'OL' '01'
+EOF
+
+    # Strip all whitespace (spaces, tabs, newlines) from the output
+    stripped_output=$(echo "$output" | tr -d '[:space:]')
+    expected_output="W0dsh3>dsh3>cmdloopreturned0"
+
+    # Debugging output (only prints if the test fails)
+    echo "Captured stdout:" 
+    echo "Output: $output"
+    echo "Exit Status: $status"
+    echo "${stripped_output} -> ${expected_output}"
+
+    # Check exact match
+    [ "$stripped_output" = "$expected_output" ]
+
+    # Assertions
+    [ "$status" -eq 0 ]
+}
